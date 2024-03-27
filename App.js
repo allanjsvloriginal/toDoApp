@@ -9,14 +9,20 @@ import {
 import { useState } from "react";
 
 export default function App() {
-  const [task, setTask] = useState("");
+  const [task, setTask] = useState({ text: "", finished: false });
   const [tasks, setTasks] = useState([]);
 
   const handleAddTask = () => {
-    if (task) {
+    if (task.text) {
       setTasks([...tasks, task]);
-      setTask("");
+      setTask({ text: "", finished: false });
     }
+  };
+
+  const handleFinishTask = (index) => {
+    const taskToUpdate = tasks[index];
+    taskToUpdate.finished = !taskToUpdate.finished;
+    setTasks([...tasks]);
   };
 
   const handleDeleteTask = (index) => {
@@ -29,17 +35,27 @@ export default function App() {
     setTasks([]);
   };
 
+  const setTextTask = (text) => {
+    setTask({ text, finished: false });
+  };
+
   const renderItem = ({ item, index }) => (
     <View style={styles.task}>
-      <Text style={styles.itemList}>{item}</Text>
+      <Text
+        style={[
+          styles.itemList,
+          { textDecorationLine: item.finished ? "line-through" : "none" },
+          { color: item.finished ? "gray" : "white" },
+        ]}
+      >
+        {item.text}
+      </Text>
       <View style={styles.taskButtons}>
-        <TouchableOpacity
-        // onPress={() => handleEditTask(index)}
-        >
-          <Text style={styles.editButton}>Edit</Text>
+        <TouchableOpacity onPress={() => handleFinishTask(index)}>
+          <Text style={styles.editButton}>Alternar concluído</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleDeleteTask(index)}>
-          <Text style={styles.deleteButton}>Delete</Text>
+          <Text style={styles.deleteButton}>Deletar</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -52,17 +68,17 @@ export default function App() {
         style={styles.input}
         placeholder="Enter task"
         placeholderTextColor="#a3a19d"
-        value={task}
-        onChangeText={(text) => setTask(text)}
+        value={task.text}
+        onChangeText={(text) => setTextTask(text)}
       />
       <TouchableOpacity style={styles.addButton} onPress={handleAddTask}>
-        <Text style={styles.addButtonText}>Add Task</Text>
+        <Text style={styles.addButtonText}>Adicionar Tarefa</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.clearAllButton}
         onPress={handleClearAllTask}
       >
-        <Text style={{ color: "white" }}>Clear All Tasks</Text>
+        <Text style={{ color: "white" }}>Limpar todas as tarefas</Text>
       </TouchableOpacity>
       <FlatList
         data={tasks}
